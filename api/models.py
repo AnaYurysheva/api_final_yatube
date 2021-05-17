@@ -13,7 +13,7 @@ class Group(models.Model):
     description = models.TextField(blank=True)
 
     def __str__(self):
-        return self.title
+        return tw.shorten(self.title, 15)
 
 
 class Post(models.Model):
@@ -69,3 +69,6 @@ class Follow(models.Model):
                 fields=('user', 'following'),
                 name='unique_follow'),
         )
+
+    def __str__(self):
+        return f'{self.user} подписан на {self.following}'

@@ -18,8 +18,7 @@ class PostViewSet(viewsets.ModelViewSet):
         permissions.IsAuthenticatedOrReadOnly,
         IsAuthorOrReadOnly,
     )
-
-    filter_backends = [DjangoFilterBackend]
+    filter_backends = (DjangoFilterBackend,)
     filterset_fields = ['group', ]
 
     def perform_create(self, serializer):
@@ -27,7 +26,6 @@ class PostViewSet(viewsets.ModelViewSet):
 
 
 class CommentViewSet(viewsets.ModelViewSet):
-
     serializer_class = serializers.CommentSerializer
     permission_classes = (
         permissions.IsAuthenticatedOrReadOnly,
@@ -56,9 +54,8 @@ class FollowViewSet(viewsets.ModelViewSet):
     permission_classes = (
         permissions.IsAuthenticated,
     )
-
-    filter_backends = [filters.SearchFilter]
-    search_fields = ['user__username']
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ['user__username', 'following__username']
 
     def get_queryset(self):
         return Follow.objects.filter(following=self.request.user)

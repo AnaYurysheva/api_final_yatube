@@ -11,7 +11,7 @@ class PostSerializer(serializers.ModelSerializer):
     author = serializers.ReadOnlyField(source='author.username')
 
     class Meta:
-        fields = ('id', 'text', 'author', 'pub_date')
+        fields = '__all__'
         model = Post
 
 
@@ -19,14 +19,14 @@ class CommentSerializer(serializers.ModelSerializer):
     author = serializers.ReadOnlyField(source='author.username')
 
     class Meta:
-        fields = ('id', 'author', 'post', 'text', 'created')
+        fields = '__all__'
         model = Comment
 
 
 class GroupSerializer(serializers.ModelSerializer):
 
     class Meta:
-        fields = ('id', 'title', 'slug', 'description')
+        fields = '__all__'
         model = Group
 
     def validate_slug(self, value):
@@ -52,18 +52,19 @@ class FollowSerializer(serializers.ModelSerializer):
         queryset=User.objects.all())
 
     class Meta:
-        fields = ('id', 'user', 'following',)
+        fields = '__all__'
         model = Follow
-        validators = [
+        validators = (
             UniqueTogetherValidator(
                 queryset=Follow.objects.all(),
-                fields=['user', 'following']
-            )
-        ]
+                fields=('user', 'following')
+            ),
+        )
 
     def validate_following(self, following):
-        if self.context.get('request').method == 'POST':
-            if self.context.get('request').user == following:
-                raise serializers.ValidationError(
-                    'You can not follow to yourself.')
+        if self.context.get('request').method != 'POST':
+            return following
+        if self.context.get('request').user == following:
+            raise serializers.ValidationError(
+                'You can not follow to yourself.')
         return following
